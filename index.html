@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Obfuscator by utf8xbot</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="settings-section">
+            <h3>🏷️ Naming</h3>
+            <div class="setting-row">
+                <label>Prefix<span class="info">Добавляется ко всем именам</span></label>
+            </div>
+            <input type="text" class="setting-input" id="prefix" value="by_utf8xbot" placeholder="by_utf8xbot">
+
+            <div class="setting-row" style="margin-top:12px">
+                <label>Naming Style<span class="info">Как генерируются имена</span></label>
+            </div>
+            <select class="setting-input" id="namingStyle">
+                <option value="random_num">Prefix + Random Numbers</option>
+                <option value="underscores">___Abbreviation___</option>
+                <option value="hex">Prefix + Hex</option>
+                <option value="mixed">Mixed (random)</option>
+                <option value="unicode">Unicode runes</option>
+            </select>
+
+            <div class="setting-row" style="margin-top:12px">
+                <label>Underscore padding<span class="info">Кол-во _ вокруг (для underscores)</span></label>
+            </div>
+            <input type="number" class="setting-input" id="underscorePad" value="15" min="0" max="50">
+        </div>
+
+        <div class="settings-section">
+            <h3>🔀 Transformations</h3>
+            <div class="setting-row">
+                <label for="renameVars">Rename Variables<span class="info">let/const/var — все имена</span></label>
+                <div class="toggle"><input type="checkbox" id="renameVars" checked><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="renameFuncs">Rename Functions<span class="info">function declarations</span></label>
+                <div class="toggle"><input type="checkbox" id="renameFuncs" checked><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="renameParams">Rename Parameters<span class="info">Параметры функций</span></label>
+                <div class="toggle"><input type="checkbox" id="renameParams" checked><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="renameClasses">Rename Class Names<span class="info">class Foo</span></label>
+                <div class="toggle"><input type="checkbox" id="renameClasses" checked><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="renameProps">Rename Object Properties<span class="info">obj.myProp → obj.xxx (НЕ API)</span></label>
+                <div class="toggle"><input type="checkbox" id="renameProps"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="stringEncoding">Encode Strings<span class="info">Строки → hex escape</span></label>
+                <div class="toggle"><input type="checkbox" id="stringEncoding"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="numberEncoding">Encode Numbers<span class="info">5 → (2+3)</span></label>
+                <div class="toggle"><input type="checkbox" id="numberEncoding"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="addDeadCode">Dead Code Injection<span class="info">Фейковый мусорный код</span></label>
+                <div class="toggle"><input type="checkbox" id="addDeadCode"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="shuffleOrder">Shuffle Functions<span class="info">Перемешать top-level функции</span></label>
+                <div class="toggle"><input type="checkbox" id="shuffleOrder"><span class="slider"></span></div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>🛡️ Protection</h3>
+            <div class="setting-row">
+                <label for="addDebugProtection">Anti-Debug<span class="info">Блокировка debugger</span></label>
+                <div class="toggle"><input type="checkbox" id="addDebugProtection"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="addConsoleDisable">Disable Console<span class="info">Перехват console.log и тд</span></label>
+                <div class="toggle"><input type="checkbox" id="addConsoleDisable"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="selfDefending">Self-Defending<span class="info">Код ломается при форматировании</span></label>
+                <div class="toggle"><input type="checkbox" id="selfDefending"><span class="slider"></span></div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>📦 Output</h3>
+            <div class="setting-row">
+                <label for="wrapIIFE">Wrap in IIFE<span class="info">(()=>{...})()</span></label>
+                <div class="toggle"><input type="checkbox" id="wrapIIFE"><span class="slider"></span></div>
+            </div>
+            <div class="setting-row">
+                <label for="minifyOutput">Minify<span class="info">Убрать пробелы/переносы</span></label>
+                <div class="toggle"><input type="checkbox" id="minifyOutput"><span class="slider"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="toolbar">
+            <button class="btn btn-primary" id="btnObfuscate">⚡ Obfuscate</button>
+            <button class="btn btn-secondary" id="btnCopy">📋 Copy</button>
+            <button class="btn btn-secondary" id="btnDownload">💾 Download</button>
+            <button class="btn btn-secondary btn-small" id="btnClear">Clear</button>
+            <button class="btn btn-secondary btn-small" id="btnSample">Sample</button>
+            <span class="status" id="status"></span>
+        </div>
+        <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+        <div class="editors">
+            <div class="editor-panel">
+                <div class="editor-label">
+                    <span>📝 Input Code</span>
+                    <span class="line-count" id="inputLines">0 lines</span>
+                </div>
+                <div class="editor-wrap">
+                    <textarea class="code-editor" id="inputCode"
+                        placeholder="Вставь JavaScript код сюда..."
+                        spellcheck="false"></textarea>
+                </div>
+            </div>
+            <div class="editor-panel">
+                <div class="editor-label">
+                    <span>🔒 Obfuscated Output</span>
+                    <span class="line-count" id="outputLines">0 lines</span>
+                </div>
+                <div class="editor-wrap">
+                    <textarea class="code-editor" id="outputCode"
+                        placeholder="Результат здесь..."
+                        spellcheck="false" readonly></textarea>
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="spinner"></div>
+                        <p id="loadingText">Обфускация...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="stats-bar">
+            <span><span class="dot"></span> Input: <b id="statInputSize">0</b> chars</span>
+            <span><span class="dot"></span> Output: <b id="statOutputSize">0</b> chars</span>
+            <span><span class="dot"></span> Ratio: <b id="statRatio">0</b>x</span>
+            <span><span class="dot"></span> Time: <b id="statTime">0</b>ms</span>
+            <span><span class="dot"></span> Renamed: <b id="statRenamed">0</b></span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2>📄 Тип кода</h2>
+        <p>Это <b>полный скрипт</b> или <b>фрагмент</b> большого проекта?</p>
+        <div class="external-vars-section" id="externalVarsSection">
+            <label>⚠️ Переменные используются, но НЕ объявлены здесь:</label>
+            <div class="detected-vars" id="detectedVars"></div>
+            <div class="warning-box">
+                <b>Фрагмент</b> — эти переменные не будут переименованы.
+            </div>
+            <label style="margin-top:8px;display:block">
+                Дополнительные переменные НЕ переименовывать:
+            </label>
+            <textarea id="extraProtectedVars" placeholder="myGlobal, gameState, socket..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-modal-secondary" id="btnFragment">🧩 Фрагмент</button>
+            <button class="btn-modal btn-modal-primary" id="btnFullCode">📄 Полный скрипт</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts — порядок важен! -->
+<script src="js/constants.js"></script>
+<script src="js/nameGenerator.js"></script>
+<script src="js/extractor.js"></script>
+<script src="js/analyzer.js"></script>
+<script src="js/transformers.js"></script>
+<script src="js/obfuscator.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
