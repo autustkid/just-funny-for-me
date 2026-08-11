@@ -39,19 +39,33 @@ function injectDeadCode(code, settings) {
         const trimmed = lines[i].trim();
 
         if (trimmed !== '}' && trimmed !== '};' && trimmed !== '});') continue;
-        if (Math.random() > 0.45) continue;
-
+        if (Math.random() > 0.4) continue;
+        
         const next = (lines[i + 1] || '').trim();
 
-        if (/^else\b/.test(next))    continue;
-        if (/^catch\b/.test(next))   continue;
+        // else, catch, finally
+        if (/^else\b/.test(next)) continue;
+        if (/^catch\b/.test(next)) continue;
         if (/^finally\b/.test(next)) continue;
 
-        if (
-            next !== '' &&
-            !/^(?:function|const|let|var|class|\/\/|\/\*|if|for|while|return|switch)/.test(next) &&
-            i !== lines.length - 1
-        ) continue;
+        const isSafeSpot =
+            next === '' ||
+            next === '}' ||
+            next === '};' ||
+            next === '});' ||
+            i === lines.length - 1 ||
+            /^(?:\/\/|\/\*)/.test(next);
+
+        let depth = 0;
+        for (let j = 0; j <= i; j++) {
+            for (const ch of lines[j]) {
+                if (ch === '{') depth++;
+                else if (ch === '}') depth--;
+            }
+        }
+
+        if (depth !== 0) continue;
+        if (!isSafeSpot) continue;
 
         const deadVar = generateUniqueName('_dead', settings);
         const tpl = DEAD_TEMPLATES[Math.floor(Math.random() * DEAD_TEMPLATES.length)];
