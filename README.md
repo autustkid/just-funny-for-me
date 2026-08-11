@@ -3,7 +3,9 @@
 A client-side JavaScript obfuscator that runs entirely in the browser.  
 No server, no dependencies, no build step.
 
-🔗 **Live demo:** `https://<your-username>.github.io/<repo-name>/`
+no rust bc i noob and is github pages
+
+🔗 **Live:** `https://autustkid.github.io/just-funny-for-me/`
 
 ---
 
