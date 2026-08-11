@@ -33,25 +33,31 @@ const DEAD_TEMPLATES = [
 function injectDeadCode(code, settings) {
     const lines  = code.split('\n');
     const result = [];
+
     for (let i = 0; i < lines.length; i++) {
         result.push(lines[i]);
         const trimmed = lines[i].trim();
+
+        if (trimmed !== '}' && trimmed !== '};' && trimmed !== '});') continue;
+        if (Math.random() > 0.45) continue;
+
+        const next = (lines[i + 1] || '').trim();
+
+        if (/^else\b/.test(next))    continue;
+        if (/^catch\b/.test(next))   continue;
+        if (/^finally\b/.test(next)) continue;
+
         if (
-            (trimmed === '}' || trimmed === '};' || trimmed === '});') &&
-            Math.random() > 0.55
-        ) {
-            const next = (lines[i + 1] || '').trim();
-            if (
-                next === '' ||
-                /^(?:function|const|let|var|class|\/\/|\/\*)/.test(next) ||
-                i === lines.length - 1
-            ) {
-                const deadVar = generateUniqueName('_dead', settings);
-                const tpl = DEAD_TEMPLATES[Math.floor(Math.random() * DEAD_TEMPLATES.length)];
-                result.push(tpl(deadVar));
-            }
-        }
+            next !== '' &&
+            !/^(?:function|const|let|var|class|\/\/|\/\*|if|for|while|return|switch)/.test(next) &&
+            i !== lines.length - 1
+        ) continue;
+
+        const deadVar = generateUniqueName('_dead', settings);
+        const tpl = DEAD_TEMPLATES[Math.floor(Math.random() * DEAD_TEMPLATES.length)];
+        result.push(tpl(deadVar));
     }
+
     return result.join('\n');
 }
 
