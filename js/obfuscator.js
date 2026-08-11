@@ -129,8 +129,11 @@ async function startObfuscation() {
 
             const encodedLog = generateObfuscationLog(settings, stats);
 
-            console.log('%c[Obfuscator Debug Log] Скопируй строку ниже полностью и отправь мне:', 
-                       'color:#0ff; font-weight:bold; font-size:15px');
+            const logInput = document.getElementById('debugLogOutput');
+            if (logInput) {
+                logInput.value = 'LOG_BASE64:' + encodedLog;
+            }
+
             console.log('LOG_BASE64:' + encodedLog);
 
         } catch (err) {
